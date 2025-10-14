@@ -1,0 +1,29 @@
+# Core
+pandas==2.3.3
+numpy==2.3.3
+requests==2.32.5
+sqlalchemy==2.0.36
+python-dateutil==2.9.0.post0
+tzdata==2025.2
+
+# Machine Learning
+scikit-learn==1.7.2
+joblib==1.5.2
+scipy==1.16.2
+
+# Visualisation & Dashboard
+streamlit==1.50.0
+matplotlib==3.10.7
+
+# Météo
+meteostat==1.7.6
+
+# Utilitaires
+click==8.3.0
+colorama==0.4.6
+watchdog==6.0.0
+protobuf==6.32.1
+
+# Optionnel (API et gestion JSON avancée)
+pyarrow==21.0.0
+psycopg2-binary==2.9.11
