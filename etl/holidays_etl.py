@@ -1,15 +1,22 @@
+import pandas as pd
 from data.holidays_api import HolidaysAPI
-from core.database import DatabaseManager
-from config import POSTGRES_URL
+from etl.base_etl import BaseETL
 
-class HolidaysETL:
-    def __init__(self):
+class HolidaysETL(BaseETL):
+    def __init__(self, db):
+        super().__init__(db, "calendar_events")
         self.api = HolidaysAPI()
-        self.db = DatabaseManager(POSTGRES_URL)
 
-    def run(self):
+    def extract(self):
+        print("⬇️ Extraction jours fériés et vacances...")
         holidays = self.api.fetch_public_holidays()
-        self.db.save("holidays", holidays)
+        vacations = self.api.fetch_school_vacations()
+        holidays["type"] = "holiday"
+        vacations["type"] = "vacation"
+        return pd.concat([holidays, vacations], ignore_index=True)
 
-        school = self.api.fetch_school_vacations()
-        self.db.save("school_vacations", school)
+    def transform(self, df):
+        print("🧹 Transformation calendrier...")
+        df["start_date"] = pd.to_datetime(df.get("start_date", None))
+        df["end_date"] = pd.to_datetime(df.get("end_date", None))
+        return df

@@ -1,4 +1,4 @@
-POSTGRES_URL = "postgresql+psycopg2://user:password@localhost:5432/velibnow"
+POSTGRES_URL = "postgresql+psycopg2://postgres:R%40kuzan19735.@127.0.0.1:5432/velibnow"
 
 URL_VELIB = "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-disponibilite-en-temps-reel/records"
 URL_HOLIDAYS = "https://calendrier.api.gouv.fr/jours-feries/metropole.json"
