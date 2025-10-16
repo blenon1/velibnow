@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: ./backend
+    container_name: velib-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MODEL_EMPTY_PATH=/models/model_empty.joblib
+      - MODEL_FULL_PATH=/models/model_full.joblib
+      - STATIONS_CSV=/data/stations.csv
+    volumes:
+      - ./modeling/models_storage:/models:ro
+      - ./backend/data:/data:ro
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    container_name: velib-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - backend
+    restart: unless-stopped
