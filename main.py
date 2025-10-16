@@ -1,23 +1,24 @@
+from core.database import DatabaseManager
 from etl.velib_etl import VelibETL
 from etl.weather_etl import WeatherETL
 from etl.holidays_etl import HolidaysETL
-from features.builder import FeatureBuilder
-from modeling.model_trainer import ModelTrainer
+from features.feature_builder import FeatureBuilder
 
 if __name__ == "__main__":
+    db = DatabaseManager()
+
     print("➡️ ETL Vélib")
-    velib_data = VelibETL().run()
+    VelibETL(db).run()
 
     print("➡️ ETL Météo")
-    WeatherETL().run()
+    WeatherETL(db).run()
 
     print("➡️ ETL Jours Fériés / Vacances")
-    HolidaysETL().run()
+    HolidaysETL(db).run()
+    
+    print("\n🚀 Construction du dataset de features")
+    builder = FeatureBuilder(db)
+    features_df = builder.run()
 
-    print("➡️ Création des features")
-    df = FeatureBuilder().build()
-
-    print("➡️ Entraînement du modèle")
-    ModelTrainer().train(df)
-
-    print("✅ Pipeline terminé avec succès !")
+    print("\n✅ Pipeline complet terminé !")
+    print(f"   → Dataset enrichi sauvegardé : {len(features_df)} lignes")
