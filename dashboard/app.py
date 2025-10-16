@@ -26,23 +26,25 @@ tz_paris = pytz.timezone("Europe/Paris")
 utc_iso = tz_paris.localize(datetime.combine(d, t)).astimezone(pytz.utc).isoformat()
 st.sidebar.caption(f"Heure UTC utilisée : `{utc_iso}`")
 
-col_flags1, col_flags2, col_flags3 = st.sidebar.columns(3)
+col_flags1, col_flags2 = st.sidebar.columns(2)
 holiday_flag = col_flags1.checkbox("Jour férié ?", value=False)
-is_weekend = col_flags2.checkbox("Week-end ?", value=(d.weekday() >= 5))
-operative = col_flags3.checkbox("Station opérationnelle ?", value=True)
+is_weekend   = col_flags2.checkbox("Week-end ?", value=(d.weekday() >= 5))
 
 st.sidebar.header("🌦️ Météo (flags)")
 col_w1, col_w2, col_w3, col_w4 = st.sidebar.columns(4)
 pluie = col_w1.checkbox("Pluie", value=False)
-vent = col_w2.checkbox("Vent", value=False)
+vent  = col_w2.checkbox("Vent", value=False)
 soleil = col_w3.checkbox("Soleil", value=True)
-nuage = col_w4.checkbox("Nuage", value=False)
+nuage  = col_w4.checkbox("Nuage", value=False)
+
+# ⚠️ Toujours opérationnel = 1
+OPERATIVE_ALWAYS_ON = True
 
 run = st.sidebar.button("🚀 Lancer la prédiction")
 
 # ---- Haut de page : info API + info CSV (backend) ----
 st.title("🚲 Prédictions Vélib — Back piloté (modèles + CSV côté serveur)")
-st.caption("Le tableau API est purement informatif. La prédiction utilise la **liste station_name du CSV côté backend**.")
+st.caption("Le tableau API est informatif. La prédiction utilise la **liste station_name du CSV côté backend**. `operative` est forcé à 1.")
 
 with st.expander("📋 Aperçu des stations (API Vélib)", expanded=False):
     try:
@@ -68,7 +70,7 @@ if run:
                 utc_time_iso=utc_iso,
                 holiday_flag=holiday_flag,
                 is_weekend=is_weekend,
-                operative=operative,
+                operative=OPERATIVE_ALWAYS_ON,   # ← forcé à 1
                 pluie=int(pluie),
                 vent=int(vent),
                 soleil=int(soleil),
@@ -88,16 +90,13 @@ if run:
         )
 
         # --- 🗺️ Carte des stations ---
-        st.subheader("🗺️ Carte des stations prédites")
+        st.subheader("🗺️ Carte des stations prédites (couleur = places libres)")
 
         if not {"lat", "lon"}.issubset(df_res.columns):
             st.info("Pas de colonnes `lat`/`lon` dans le résultat — impossible d’afficher la carte.")
         else:
-            proba_col = st.radio(
-                "Probabilité à afficher en intensité/couleur :",
-                ["proba_velo_depart", "proba_place_arrivee"],
-                horizontal=True,
-            )
+            # On utilise UNIQUEMENT la proba_place_arrivee pour la couleur (vert → rouge)
+            proba_col = "proba_place_arrivee"
 
             map_df = df_res.copy()
             map_df = map_df.dropna(subset=["lat", "lon"])
@@ -110,11 +109,11 @@ if run:
                 p = map_df[proba_col].clip(0, 1).fillna(0)
                 map_df["radius"] = (50 + 250 * p).astype(float)
 
-                # Champs texte formatés pour le tooltip (pydeck ne gère pas {:.2f})
-                map_df["proba_depart_txt"]  = map_df["proba_velo_depart"].fillna(0).map(lambda x: f"{x:.2f}")
-                map_df["proba_arrivee_txt"] = map_df["proba_place_arrivee"].fillna(0).map(lambda x: f"{x:.2f}")
+                # Champs texte pour tooltip (formatés)
+                map_df["proba_depart_txt"]  = map_df.get("proba_velo_depart", 0).fillna(0).map(lambda x: f"{x:.2f}")
+                map_df["proba_arrivee_txt"] = map_df.get("proba_place_arrivee", 0).fillna(0).map(lambda x: f"{x:.2f}")
 
-                # Couleur: rouge → vert selon la proba sélectionnée
+                # Couleur: rouge (0) → vert (1) selon proba_place_arrivee
                 map_df["r"] = (255 * (1 - p)).astype(int)
                 map_df["g"] = (255 * p).astype(int)
                 map_df["b"] = 60
