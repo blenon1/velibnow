@@ -1,0 +1,41 @@
+(.venv) PS C:\Users\julie\Documents\M2\Hackaton\velibnow> python .\main.py
+Would you run VELIB STEP (Yes/No) ? No
+Would you run WEATHER STEP (Yes/No) ? No
+Would you run HOLIDAYS STEP (Yes/No) ? No
+Would you run FEATURES STEP (Yes/No) ? Yes
+➡️ Start loading needed table from postgresql and generating feature and joining
+➡️ Start reading pg table velib
+✅ pg table velib successfuly read
+➡️ Start reading pg table weathers
+✅ pg table weathers successfuly read
+➡️ Start reading pg table calendar
+✅ pg table calendar successfuly read
+🧹 Préparation des données...
+⚙️ Construction des features...
+C:\Users\julie\Documents\M2\Hackaton\velibnow\features\feature_builder.py:70: FutureWarning: Downcasting object dtype arrays on .fillna, .ffill, .bfill is deprecated and will change in a future version. Call result.infer_objects(copy=False) instead. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  df["fill_rate"] = (df["available_total"] / df["capacity"].replace(0, pd.NA)).fillna(0).clip(0, 1)
+📏 Seuils appliqués: target_empty >= 0.83 | target_full >= 0.17
+✅ Données non vide -> écriture en cours
+✅ Données insérées dans features (10986730 lignes, chunksize=500000)
+✅ Features data saved successfully !
+Would you train a model (Yes/No) ? Yes
+whitch model (target_full/target_empty) ?target_empty
+➡️ Start reading pg table features
+✅ pg table features successfuly read
+[from_config] → Création du modèle depuis un dictionnaire de config...
+[__init__] → Début initialisation du modèle
+[__init__] ✓ Fin initialisation du modèle
+[from_config] ✓ Modèle créé depuis la config.
+[fit] → Début entraînement du modèle...
+[_build_preprocessor] → Construction du préprocesseur...
+[_build_preprocessor] ✓ Préprocesseur construit.
+[_prepare_features] → Préparation des features...
+[_add_time_features] → Début génération des features temporelles...
+[_add_time_features] ✓ Features temporelles ajoutées.
+[_ensure_columns] → Vérification des colonnes requises...
+[_ensure_columns] ✓ Toutes les colonnes sont présentes.
+[_prepare_features] ✓ Features préparées.
+[fit] → Entraînement en cours...
+      Iter       Train Loss   Remaining Time 
+         1           1.2182           30.33m
+         2           1.2131           29.34m

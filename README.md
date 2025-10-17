@@ -1,3 +1,11 @@
+# velibnow-historicalManager
+
+Projet de bout en bout qui **ingère les historiques Vélib / météo / calendrier**, **entraîne deux modèles** (stations *vides* et *pleines*) et **expose les prédictions** via un **backend FastAPI**, consultables dans un **dashboard Streamlit** (tableaux + carte).
+
+**But** : aider les usagers à **trouver rapidement** des stations avec **vélos disponibles au départ** et **places libres à l’arrivée**, en sélectionnant un **jour** et une **heure**. Les prédictions automatisent cette recherche pour **simplifier l’expérience utilisateur**.
+
+---
+
 ## Structure du projet 
 ```bash
 velibnow-historicalManager/
@@ -47,34 +55,87 @@ velibnow-historicalManager/
          model_empty.joblib   # Modèle pour prédire “station vide”
          model_full.joblib    # Modèle pour prédire “station pleine”
 ```
+## Prérequis
+- **Docker** (exécuter backend + dashboard facilement)
+- (Optionnel) **Python 3.12** si tu veux lancer ingestion/entraînement en local
+- (Optionnel) **PostgreSQL** si tu n’utilises pas Docker pour la DB
 
-## Setup de l'environnement
+## Setup de l’environnement (local)
 ```bash
 python3.12 -m venv .venv
-source .venv/bin/activate # Linux
-.\.venv\Scripts\activate # Window
+# Linux/macOS
+source .venv/bin/activate
+# Windows
+.\.venv\Scripts\activate
+
 pip install -r requirements.txt
 ```
 
-## Setup de la base de données
-**Prérequis** : Avoir docker installé sur la machine d'éxécution  
+## Lancer la base de données (si utilisée)
 ```bash
 cd core
-docker compose up -d
-cd .. # Revenir à la racine du projet
+docker compose up -d        # lance PostgreSQL
+cd ..                       # reviens à la racine
 ```
 
-## Traitement des données et entrainement du model
-**Prérequis** : S'assurer que les données sources (.csv) soient disponibles dans /data/dataset  
+## Ingestion des données → PostgreSQL
+> Assure-toi d’avoir les CSV sources dans `data/dataset/`.
+
 ```bash
-python main.py # Exécute le code étape par étape
+python main.py
 ```
-Une fois les données traitées et entrainées, les models seront stockés dans /modeling/models_storage
+- Charge l’historique Vélib + météo + calendrier et sauvegarde en base.
+- Le DSN Postgres est lu depuis `config.py` (ex: `POSTGRES_URL`).
 
-## Utilisation des models pour prédiction
-**Prérequis** : Avoir docker installé sur la machine d'éxécution 
-A la racine du projet :  
-```bash 
+## Entraînement des modèles
+Le script typique (voir `modeling/model_trainer.py`) :
+- Charge les features (via `features/feature_builder.py`).
+- Entraîne deux modèles (ex: `target_empty` et `target_full`).
+- Sauvegarde dans `modeling/models_storage/`.
+
+**Sorties attendues :**
+```
+modeling/models_storage/
+  ├─ model_empty.joblib
+  └─ model_full.joblib
+```
+
+## Lancer l’application (backend + dashboard)
+À la **racine** du projet :
+```bash
 docker compose up -d
-``` 
-Cela va démarer un backend (fastapi) du dossier ./backend ainsi que un (frontend) streamlit dans le dossier ./dashboard
+```
+- **Backend (FastAPI)** : http://localhost:8000  
+  - Endpoints utiles :
+    - `GET /health` : statut
+    - `GET /stations` : infos stations (via API Vélib ou fallback CSV)
+    - `GET /stations/csv` : noms de stations du CSV côté serveur
+    - `POST /predict` : lance les deux prédictions et renvoie un DataFrame combiné
+
+- **Dashboard (Streamlit)** : http://localhost:8501  
+  - Affiche un aperçu des stations (info), la liste des stations (CSV côté backend), lance les prédictions, affiche le tableau résultats et une **carte** pydeck (couleur ↔ proba).
+
+## Variables & chemins importants
+- **Modèles (backend)**  
+  - Variables d’env : `MODEL_EMPTY_PATH`, `MODEL_FULL_PATH`  
+  - Par défaut montés via le volume Compose :
+    ```yaml
+    ./modeling/models_storage:/models:ro
+    ```
+  - Dans le conteneur backend : `/models/model_empty.joblib`, `/models/model_full.joblib`
+
+- **CSV des stations côté backend (optionnel)**  
+  - Généralement `backend/data/stations.csv` (ou volume similaire)
+  - L’API `/stations/csv` renvoie la liste des `station_name` utilisés pour la prédiction.
+
+## Flux logique (résumé)
+1. **Ingestion** (`main.py`) : lit CSV/API → **Postgres** (via `core/database.py`).
+2. **Features** (`features/feature_builder.py`) → dataset d’entraînement.
+3. **Entraînement** (`modeling/model_trainer.py`) → export `.joblib`.
+4. **Backend** (`backend/server.py`) : charge les modèles, sert `/predict`.
+5. **Dashboard** (`dashboard/app.py`) : appelle le backend, affiche **tableau** et **carte**.
+
+## Dépannage rapide
+- `404 /stations` : backend pas démarré, ou endpoint non exposé → relancer `docker compose up -d`.
+- `python-multipart` manquant : ajoute-le dans `backend/requirements.txt`.
+- Modèles introuvables : vérifie le **volume** des modèles dans `docker-compose.yaml` et les env `MODEL_EMPTY_PATH` / `MODEL_FULL_PATH`.
