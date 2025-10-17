@@ -1,9 +1,7 @@
-# dashboard/Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# (optionnel mais utile) variables runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     BACKEND_URL=http://backend:8000

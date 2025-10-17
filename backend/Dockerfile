@@ -6,7 +6,6 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# dependances système minimales + libgomp1 (recommandé pour numpy/scikit)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential curl libgomp1 && \
     rm -rf /var/lib/apt/lists/*
