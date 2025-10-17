@@ -14,14 +14,14 @@ def _check(resp: requests.Response):
 
 
 def get_stations_from_backend() -> pd.DataFrame:
-    """Appelle GET /stations (informatif)."""
+    """Appel GET /stations (informatif)."""
     r = requests.get(f"{BACKEND_URL}/stations", timeout=20)
     data = _check(r)
     return pd.DataFrame(data.get("stations", []))
 
 
 def get_station_names_from_csv_backend() -> list[str]:
-    """Appelle GET /stations/csv -> liste station_name depuis le backend."""
+    """Appel GET /stations/csv -> liste station_name depuis le backend."""
     r = requests.get(f"{BACKEND_URL}/stations/csv", timeout=20)
     data = _check(r)
     return data.get("station_names", [])

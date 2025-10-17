@@ -1,4 +1,4 @@
-POSTGRES_URL = "postgresql+psycopg2://postgres:R%40kuzan19735.@127.0.0.1:5432/velibnow"
+POSTGRES_URL = "postgresql+psycopg2://myuser:mypassword@localhost:5432/velibnow"
 
 URL_VELIB = "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-disponibilite-en-temps-reel/records"
 URL_HOLIDAYS = "https://calendrier.api.gouv.fr/jours-feries/metropole.json"
@@ -7,3 +7,6 @@ URL_METEO_HOURLY = "https://api.open-meteo.com/v1/forecast?latitude=48.8566&long
 
 MODEL_PATH = "model.pkl"
 HORIZON_MIN = 30
+
+HISTORICAL_VELLIB_CSV_PATH = "./data/dataset/historique_stations.csv"
+WEATHER_HISTORICAL_CSV_PATH = "./data/dataset/historical_meteo.csv"
