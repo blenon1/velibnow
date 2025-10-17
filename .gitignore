@@ -1,3 +1,10 @@
-__pycache__/
-.venv
+# 🧹 Ignorer tous les fichiers de cache Python partout
+**/__pycache__/
+*.py[cod]
+
+# 🛠️ Ignorer l'environnement virtuel
+.venv/
+
+# 📁 Ignorer ton dataset spécifique
 data/dataset/historique_stations.csv
+data/dataset/historical_stations.csv
