@@ -43,7 +43,7 @@ OPERATIVE_ALWAYS_ON = True
 run = st.sidebar.button("🚀 Lancer la prédiction")
 
 # ---- Haut de page : info API + info CSV (backend) ----
-st.title("🚲 Prédictions Vélib — Back piloté (modèles + CSV côté serveur)")
+st.title("🚲 Prédictions Vélib — Disponibilité Station/Vélo")
 st.caption("Le tableau API est informatif. La prédiction utilise la **liste station_name du CSV côté backend**. `operative` est forcé à 1.")
 
 with st.expander("📋 Aperçu des stations (API Vélib)", expanded=False):
