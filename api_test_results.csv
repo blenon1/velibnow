@@ -1,4 +1,0 @@
-api_name,url,status_code,content_type,keys,response_time_s,error,timestamp
-Jours fériés,https://calendrier.api.gouv.fr/jours-feries/metropole.json,200,application/json; charset=utf-8,"['2030-01-01', '2030-04-22', '2030-05-01', '2030-05-08', '2030-05-30']",0.36,,2025-10-14T18:30:58.780630
-Vacances scolaires,https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records?limit=5,200,application/json; charset=utf-8,"['total_count', 'results']",0.41,,2025-10-14T18:30:59.150351
-Vélib disponibilité,https://velib-metropole-opendata.smovengo.cloud/opendata/Velib_Metropole/station_status.json,200,application/json,"['lastUpdatedOther', 'ttl', 'data']",0.44,,2025-10-14T18:30:59.563068

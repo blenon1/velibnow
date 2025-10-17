@@ -1,2 +1,3 @@
 __pycache__/
-.venvdata/dataset/historique_stations.csv
+.venv
+data/dataset/historique_stations.csv
