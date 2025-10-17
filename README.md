@@ -10,7 +10,7 @@ Projet de bout en bout qui **ingère les historiques Vélib / météo / calendri
 ```bash
 velibnow-historicalManager/
 │  .gitignore                 # Fichiers/dossiers ignorés par Git
-│  conception.ipynb           # Notebook d’exploration/POC
+│  ExplorationConception.ipynb           # Notebook d’exploration/POC
 │  config.py                  # Variables globales (ex: URLs, chemins, clés)
 │  docker-compose.yaml        # Orchestration Docker (backend + dashboard + volumes)
 │  main.py                    # Script d’ingestion orchestré (charge & sauvegarde en DB)
